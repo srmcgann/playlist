@@ -16,7 +16,11 @@
     <style>
       body, html{
         margin: 0;
-        background: linear-gradient(#000, #102);
+        background-color: #002;
+        background-image: url(../LbEnV.jpg);
+        background-repead: no-repeat;
+        background-attachment: fixed;
+        background-size: 100vw 100vh;
         min-height: 100vh;
         text-align: center;
         font-family: courier;
@@ -24,11 +28,40 @@
         font-size: 24px;
         overflow-x: hidden;
       }
+      .bg_overlay{
+        position: fixed;
+        width: 100vw;
+        height: 100vh;
+        z-index: 0;
+        top: 0;
+        left: 0;
+        background: linear-gradient(45deg, #300b, #310b, #330b, #013b, #003b, #103b);
+        background-repeat: no-repeat;
+        background-attachment: fixed;
+        background-size: 100vw 100vh;
+        background-position: center center;
+      }
+      .headerLogo{
+        position: absolute;
+        left: 50%;
+        z-index: 100;
+        top: 20px;
+        transform: translate(-50%);
+        width: 400px;
+        height: 100px;
+        background-image: url(playlist_logo.png);
+        background-size: 400px 100px;
+        background-repeat: no-repeat;
+        background-position: center center;
+      }
       .main{
         width: 800px;
         display: inline-block;
         position: relative;
-        margin-top: 100px
+        width: 100%;
+        min-height: 100vh;
+        padding-top: 200px;
+        margin-bottom: 100px;
       }
       button{
         border: none;
@@ -54,7 +87,6 @@
         text-align: center;
       }
       #playlists{
-        background: linear-gradient(#204,#0000);
         padding-top:5px;
         width: 100%;
         display: inline-block;
@@ -105,6 +137,8 @@
     </style>
   </head>
   <body>
+    <div class="bg_overlay"></div>
+    <div class="headerLogo"></div>
     <div class="main">
       create playlist
       <br><br>
