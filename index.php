@@ -59,7 +59,7 @@
         display: inline-block;
         position: relative;
         width: 100%;
-        min-height: 100vh;
+        min-height: calc(100vh - 300px);
         padding-top: 200px;
         margin-bottom: 100px;
       }
