@@ -17,7 +17,7 @@
   $allWords = mysqli_real_escape_string($link, $data->{'allWords'});
   if(!$sparam) die();
   $sparam = urlencode($sparam);
-  $searchURL = "https://www.googleapis.com/youtube/v3/search?part=snippet&type=video&maxResults=25&q=$sparam&key=$APIKEY";
+  $searchURL = "https://www.googleapis.com/youtube/v3/search?part=snippet&type=video&maxResults=50&q=$sparam&key=$APIKEY";
   $res = file_get_contents($searchURL);
   $data=json_decode($res);
   $v_ids=[];

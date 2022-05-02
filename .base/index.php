@@ -9,14 +9,46 @@
     <style>
       body, html{
         border: 0;
-        background: linear-gradient(45deg, #000, #103);
+        background-color: #002;
+        background-image: url(../LbEnV.jpg);
         background-repead: no-repeat;
         background-attachment: fixed;
+        background-size: 100vw 100vh;
         height: 100vh;
         overflow: hidden;
         color:#cfd;
         font-size: .85em;
         font-family: courier;
+        margin: 0;
+      }
+      .bg_overlay{
+        position: fixed;
+        width: 100vw;
+        height: 100vh;
+        z-index: 0;
+        top: 0;
+        left: 0;
+        background: linear-gradient(45deg, #300b, #310b, #330b, #013b, #003b, #103b);
+        background-repeat: no-repeat;
+        background-attachment: fixed;
+        background-size: 100vw 100vh;
+        background-position: center center;
+      }
+      .headerLogo{
+        border-radius: 10px;
+        border: 1px solid #4f82;
+        position: fixed;
+        cursor: pointer;
+        left: 10px;
+        background-size: 200px 50px;
+        background-repeat: no-repeat;
+        background-position: center center;
+        background-color: #4f84;
+        background-image: url(../playlist_logo.png);
+        top: 10px;
+        z-index: 100;
+        width: 200px;
+        height: 50px;
       }
       .main{
         text-align: center;
@@ -24,6 +56,8 @@
         z-index: 10;
         top: 0;
         left: 0;
+        position: relative;
+        min-height: 100vh;
         width: 100%;
       }
       .deleteButton{
@@ -60,7 +94,7 @@
         padding-left: 60px;
         padding-right: 5px;
         background-image: url(2ftyk1.png);
-        background-color: #004;
+        background-color: #012;
         background-repeat: no-repeat;
         background-position: 10px center;
         background-size: 45px 45px;
@@ -75,6 +109,7 @@
         height:290px;
         border:none;
         vertical-align:top;
+        border-radius: 10px;
       }
       input[type=checkbox]{
         transform: scale(2.0);
@@ -113,7 +148,7 @@
         height: calc(100vh - 100px);
         padding-top: 100px;
         text-align: center;
-        background: #012c;
+        background: #001414e8;
         display: none;
         overflow-y: auto;
       }
@@ -187,6 +222,8 @@
     </style>
   </head>
   <body>
+    <div class="headerLogo" onclick="window.location.href='/'" title="go to homepage"></div>
+    <div class="bg_overlay"></div>
     <div id="addTrackModal" class="modal">
       <input
         spellcheck="false"
