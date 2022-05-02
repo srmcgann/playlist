@@ -19,7 +19,7 @@
         shell_exec($cmd);
         $cmd = "rm $tempname";
         shell_exec($cmd);
-        echo json_encode([true, $filename]);
+        echo json_encode([true, "$filename.mp3"]);
         die();
       }else{
         echo [false];
@@ -42,7 +42,7 @@
         shell_exec($cmd);
         $cmd = "rm $tempname";
         shell_exec($cmd);
-        echo json_encode([true, $filename]);
+        echo json_encode([true, "$filename.mp3"]);
         die();
       }else{
         echo [false];
