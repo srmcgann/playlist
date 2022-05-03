@@ -99,7 +99,7 @@
         background-position: 10px center;
         background-size: 45px 45px;
       }
-      #playerFrame{
+      .playerFrame{
         left: 0;
         top:0;
         margin-top:0px;
@@ -133,12 +133,12 @@
         cursor: pointer;
       }
       .trackButtons{
-        margin-top: 0px;
+        margin-top: 20px;
         width:100%;
         min-width: 600px;
         max-width: 75%;
         display: inline-block;
-        max-height: calc(100vh - 370px);
+        max-height: calc(100vh - 390px);
         overflow-x: hidden;
         overflow-y: auto;
       }
@@ -219,6 +219,35 @@
         background: #f00;
         font-weight: 900;
       }
+      #bufferedTrack{
+        top: 348px;
+        left: 50%;
+        line-height: 16px;
+        transform: translate(-50%);
+        font-size: 18px;
+        background: linear-gradient(90deg, #000, #0000);
+        position: absolute;
+        text-align: left;
+        padding: 5px;
+        break-word: break-all;
+        width: 65%;
+        color: #bbba;
+      }
+      .bufferTrackTitle{
+        font-size: 18px;
+        font-style: oblique;
+        color: #aaa;
+      }
+      .loaded{
+        background: #4f8c;
+        color: #000;
+        position: absolute;
+        margin-top: -1px;
+        margin-left: 5px;
+        font-size: 16px;
+        line-height: 16px;
+        font-weight: 900;
+      }
     </style>
   </head>
   <body>
@@ -233,12 +262,12 @@
         id="searchBar"
       ><br>
       <div style="width: 300px;text-align: left;margin-left:auto;margin-right: auto;margin-top: 20px;">
-        <label for="exact">
-          <input type="checkbox" id="exact" oninput="toggleExact(this)">
+        <label for="exactCB">
+          <input type="checkbox" id="exactCB" oninput="toggleExact(this)">
           exact match
         </label><br>
-        <label for="allWords">
-          <input type="checkbox" checked id="allWords" oninput="toggleAllWords(this)">
+        <label for="allWordsCB">
+          <input type="checkbox" checked id="allWordsCB" oninput="toggleAllWords(this)">
           include all words
         </label>
       </div>
@@ -255,19 +284,29 @@
       </label>
       <button onclick="showModal('#addTrackModal')" class="normalButtons">add track(s)</button>
       <br><br>
-      <iframe
-        id="playerFrame"
-        src=""
-      ></iframe>
+      <div id="iframeDiv">
+        <iframe
+          class="playerFrame"
+          src=""
+        ></iframe>
+      </div>
       <br><br>
       <div class="trackButtons"></div>
+      <div id="bufferedTrack"><span style="color: #fff;">next track:</span><br></div>
     <script>
       Rn=Math.random
       userInteracted = false
       let searchBar = document.querySelector('#searchBar')
       let searchResults = document.querySelector('#searchResults')
-      let allWords = document.querySelector('#allWords')
-      let exact = document.querySelector('#exact')
+      let allWordsCB = document.querySelector('#allWordsCB')
+      let exactCB = document.querySelector('#exactCB')
+      let iframeDiv = document.querySelector('#iframeDiv')
+      let buffer_el = ''
+      let nextRnd
+      let shuffle = false
+      let exact = false
+      let allWords = true      
+      let bufferedTrack=document.querySelector('#bufferedTrack')
 
       window.onkeydown=e=>{
         if(e.keyCode==27) closeModal('#addTrackModal')
@@ -296,7 +335,7 @@
           body: JSON.stringify(sendData),
         }).then(res=>res.json()).then(data=>{
           if(data[0]){
-            tracks = ['/tracks/' + data[1], ...tracks]
+            tracks = ['tracks/' + data[1], ...tracks]
             renderTracks()
           } else {
             alert('there was a problem adding the track!')
@@ -379,12 +418,41 @@
         }
       }
       
+      next = ''
+      
+      preloadNext=()=>{
+        setTimeout(()=>{
+          nextRnd = shuffle? Rn()*tracks.length|0 : (curIDX + 1)%tracks.length
+          let nextTrackName=decodeURI(tracks[nextRnd].replaceAll('tracks/',''))
+          let t=0
+          let loadingTimer = setInterval(()=>{
+            bufferedTrack.innerHTML='<span style="color: #afc;font-weight: 900;">next track:</span>'+" <span style=\"color: #aaa;font-weight: 900;\">(buffering"+('.'.repeat(t%8))+('&nbsp;'.repeat(8-(t%8)))+")</span>"+'<br>'+('&nbsp;'.repeat(4))+'<span class="bufferTrackTitle">'+nextTrackName+'</span>'
+            t+=1
+          }, 50)
+          preload = new Audio()
+          preload.style.position='absolute'
+          preload.style.visibility='hidden'
+          document.body.appendChild(preload)
+          setTimeout(()=>{
+            clearInterval(loadingTimer)
+          }, 30000)
+          setTimeout(()=>{
+            preload.crossorigin="anonymous"
+            preload.src = window.location.href + tracks[nextRnd] + (userInteracted ? '?autoplay' : '')
+            preload.onloadeddata=()=>{
+              clearInterval(loadingTimer)
+              bufferedTrack.innerHTML='<span style="color: #afc;font-weight: 900;">next track:</span>'+` <span class="loaded">(loaded!)</span>`+'<br>'+('&nbsp;').repeat(4)+'<span class="bufferTrackTitle">'+nextTrackName+'</span>'
+            }
+          }, 5000)
+        }, 0)
+      }
+      
       playTrack=idx=>{
         let el
-        (el = document.querySelector('#playerFrame'))
+        (el = document.querySelectorAll('.playerFrame')[0])
+        preloadNext()
         postMessage(JSON.stringify({'userInteracted': userInteracted}))
         el.src = 'https://audioplayer.dweet.net/' + window.location.href + tracks[idx] + (userInteracted ? '?autoplay' : '')
-        
       }
       
       curIDX = 0
@@ -398,7 +466,7 @@
           tb.onclick = () =>{
             playTrack(curIDX = i)
           }
-          tb.innerHTML = decodeURI(v.replaceAll('/tracks/', '')) + '<br>'
+          tb.innerHTML = decodeURI(v.replaceAll('tracks/', '')) + '<br>'
           trackDiv.appendChild(tb)
           let db = document.createElement('button')
           db.className = 'deleteButton'
@@ -410,7 +478,8 @@
       }
 
       postMessage=msg=>{
-        let el = document.querySelector('#playerFrame')
+        let el
+        (el = document.querySelectorAll('.playerFrame')[0])
         if(el.src.indexOf('https://audioplayer.dweet.net') != -1){
           el.contentWindow.postMessage(msg, 'https://audioplayer.dweet.net')
         }
@@ -420,7 +489,7 @@
         const data = e[key];
         switch(data){
           case 'ended':
-            playTrack(shuffle ? Rn()*tracks.length|0 : curIDX=(curIDX+1)%tracks.length)
+            playTrack(shuffle ? nextRnd : curIDX=(curIDX+1)%tracks.length)
           break
           case 'playing':
             userInteracted = true
@@ -428,12 +497,9 @@
         }
       },false);
 
-      shuffle = false
-      exact = false
-      allWords = true
-
       toggleShuffle=e=>{
         shuffle = e.checked
+        preloadNext()
       }
 
       toggleExact=e=>{
@@ -448,7 +514,7 @@
         <?
           foreach (glob("tracks/*.mp3") as $filename) {
             $file = str_replace('/','', str_replace("tracks/", "", $filename));
-            echo "'/tracks/".rawurlencode("$file") . "'" . ",";
+            echo "'tracks/".rawurlencode("$file") . "'" . ",";
           }
         ?>
       ]
@@ -466,7 +532,8 @@
       vid.muted=true
       vid.play()
       renderTracks()
-      playTrack(shuffle ? Rn()*tracks.length|0 : curIDX=(curIDX)%tracks.length)
+      nextRnd = Rn()*tracks.length|0
+      playTrack(shuffle ? nextRnd : curIDX=(curIDX)%tracks.length)
     </script>
     </div>
   </body>
